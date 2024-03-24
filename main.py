@@ -2,11 +2,12 @@ import tkinter as tk
 from tkinter import *
 from tkinter import font, filedialog, IntVar, StringVar
 from os.path import expanduser
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 
 #variables
 BG_COLOR = "#606166"
-
 
 # Main window
 window = tk.Tk()
@@ -33,7 +34,31 @@ def browse_CallIntensity_file():
 def generate_chart():
     input_data = entry_HandlingTime_path.get()
     with open(input_data, "r") as myfile:
-        time_average(myfile)
+        time = time_average(myfile)
+
+    input_data = entry_CallIntensity_path.get()
+    time_table = []
+    int_table = []
+    with open(input_data, "r") as myfile:
+        for el in myfile:
+            el_table = el.split()
+            print(el_table)
+            time_table.append(el_table[0])
+            int_table.append((float(el_table[1].replace(',', '.'))))
+    print(time_table)
+    print(int_table)
+
+    traffic_table = [intensity*time for intensity in int_table]
+    time_table = [int(time) / 60 for time in time_table]
+
+    plt.figure(figsize=(8, 6))
+    sns.lineplot(x = time_table, y = traffic_table)
+    plt.xlabel("Time")
+    plt.xticks(range(0, 25, 3))
+    plt.show()
+
+
+    
 
 def time_average(file):
     total = 0
@@ -45,9 +70,7 @@ def time_average(file):
         count += 1
 
     if count > 0:
-        average = total/count
-        print(f"average: {average}")
-
+         return total/count
 
 # Choosing method
 button_frame = tk.Frame(window)
