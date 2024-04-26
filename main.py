@@ -98,6 +98,21 @@ def insert_intensity_time_manually():
 
     intensity_time_data.focus()
 
+
+# def insert_data_manually():
+#  newWindow = Toplevel(window)
+#  newWindow.title("Insert Data Manually")
+#
+#  handling_time_data = scrolledtext.ScrolledText(newWindow,wrap=tk.WORD, width=40, height=20)
+#  handling_time_data.grid(column=0, row=0)
+#  intensity_time_data = scrolledtext.ScrolledText(newWindow,wrap=tk.WORD, width=40, height=20)
+#  intensity_time_data.grid(column=1, row=0)
+#
+#  save_data_button = tk.Button(newWindow, text="Save Data", command=lambda: save_to_file(handling_time_data.get("1.0", tk.END), intensity_time_data.get("1.0", tk.END)))
+#  save_data_button.grid(column = 0, row=1, padx=20, pady=15, columnspan = 2)
+#
+#  handling_time_data.focus()
+
 def generate_chart():
     start_time = int(entry_start_hour.get()) if entry_start_hour.get() else 0
     end_time = int(entry_end_hour.get()) if entry_end_hour.get() else 24
@@ -153,6 +168,34 @@ def time_average(file):
 
 
 # Choosing method
+
+def Method1_gui():
+    # Show all input elements
+    entry_HandlingTime_path.grid(row=4, padx=20, columnspan=2)
+    entry_CallIntensity_path.grid(row=7, padx=20, columnspan=2)
+    entry_start_hour.grid(row=9, column=0)
+    entry_end_hour.grid(row=9, column=1)
+    intensity_label_data.grid(row=5, pady=(20, 5), columnspan=2)
+    handling_label_data.grid(row=2, pady=(20, 5), columnspan=2)
+    insert_CallIntensity_button.grid(row=6, padx=20, pady=5)
+    input_CallIntensity_button.grid(row=6, column=1, padx=20, pady=5)
+    generate_button.grid(row=10, padx=20, pady=15, columnspan=2)
+    label_start_hour.grid(row=8, column=0, pady=(20, 5))
+    label_end_hour.grid(row=8, column=1, pady=(20, 5))
+
+def Method2_gui():
+    # Hide entry_CallIntensity_path, entry_start_hour, and entry_end_hour
+    entry_CallIntensity_path.grid_forget()
+    entry_start_hour.grid_forget()
+    entry_end_hour.grid_forget()
+    intensity_label_data.grid_forget()
+    insert_CallIntensity_button.grid_forget()
+    input_CallIntensity_button.grid_forget()
+    generate_button.grid_forget()
+    label_start_hour.grid_forget()
+    label_end_hour.grid_forget()
+
+    
 button_frame = tk.Frame(window)
 button_frame.configure(bg=BG_COLOR)
 button_frame.pack(pady=50, padx=30)
@@ -160,34 +203,35 @@ button_frame.pack(pady=50, padx=30)
 input_label_methods = tk.Label(button_frame, text="Choose the calculation method", bg=BG_COLOR, font=label_font)
 input_label_methods.grid(row=0, column=0, columnspan=2, pady=10)
 
-v = IntVar(button_frame)
 
-method1_button = tk.Radiobutton(button_frame, text="Method 1", variable=v, value=1)
+v = IntVar(button_frame, value=1)
+
+method1_button = tk.Radiobutton(button_frame, text="Method 1", variable=v, value=1, command=Method1_gui)
 method1_button.grid(row=1, column=0, padx=20, pady=5)
-method2_button = tk.Radiobutton(button_frame, text="Method 2", variable=v, value=2)
+method2_button = tk.Radiobutton(button_frame, text="Method 2",variable=v, value=2, command=Method2_gui)
 method2_button.grid(row=1, column=1, padx=20, pady=5)
 
 # Choose the method of inserting data
 # Handling time
-input_label_data = tk.Label(button_frame, text="Import 'Handling Time'", bg=BG_COLOR, font=label_font)
-input_label_data.grid(row=2, pady=(20, 5), columnspan=2)
+handling_label_data = tk.Label(button_frame, text="Import 'Handling Time'", bg=BG_COLOR, font=label_font)
+handling_label_data.grid(row=2, pady=(20, 5), columnspan=2)
 
-input_button = tk.Button(button_frame, text="Insert manually", command=insert_handling_time_manually)
-input_button.grid(row=3, padx=20, pady=5)
-file_button = tk.Button(button_frame, text="Choose from file", command=browse_HandlingTime_file)
-file_button.grid(row=3, column=1, padx=20, pady=5)
+insert_HandlingTime_button = tk.Button(button_frame, text="Insert manually", command=insert_handling_time_manually)
+insert_HandlingTime_button.grid(row=3, padx=20, pady=5)
+input_handlingTime_button = tk.Button(button_frame, text="Choose from file", command=browse_HandlingTime_file)
+input_handlingTime_button.grid(row=3, column=1, padx=20, pady=5)
 
 entry_HandlingTime_path = tk.Entry(button_frame, width=50, bg="#797a7e")
 entry_HandlingTime_path.grid(row=4, padx=20, columnspan=2)
 
 # Call intensity
-input_label_data = tk.Label(button_frame, text="Import 'Call intensity'", bg=BG_COLOR, font=label_font)
-input_label_data.grid(row=5, pady=(20, 5), columnspan=2)
+intensity_label_data = tk.Label(button_frame, text="Import 'Call intensity'", bg=BG_COLOR, font=label_font)
+intensity_label_data.grid(row=5, pady=(20, 5), columnspan=2)
 
-input_button = tk.Button(button_frame, text="Insert manually", command=insert_intensity_time_manually)
-input_button.grid(row=6, padx=20, pady=5)
-file_button = tk.Button(button_frame, text="Choose from file", command=browse_CallIntensity_file)
-file_button.grid(row=6, column=1, padx=20, pady=5)
+insert_CallIntensity_button = tk.Button(button_frame, text="Insert manually", command=insert_intensity_time_manually)
+insert_CallIntensity_button.grid(row=6, padx=20, pady=5)
+input_CallIntensity_button = tk.Button(button_frame, text="Choose from file", command=browse_CallIntensity_file)
+input_CallIntensity_button.grid(row=6, column=1, padx=20, pady=5)
 
 entry_CallIntensity_path = tk.Entry(button_frame, width=50, bg="#797a7e", )
 entry_CallIntensity_path.grid(row=7, padx=20, columnspan=2)
