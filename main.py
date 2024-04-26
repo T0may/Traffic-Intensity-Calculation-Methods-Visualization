@@ -6,7 +6,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import tempfile
 
-#variables
+# variables
 BG_COLOR = "#606166"
 
 # Main window
@@ -17,58 +17,86 @@ window.resizable(False, False)
 window.configure(bg=BG_COLOR)
 label_font = font.Font(size=13)
 
-#Functions
+
+# Functions
 def insert_CallIntensity_path(path):
     if path:
         entry_CallIntensity_path.delete(0, tk.END)
         entry_CallIntensity_path.insert(0, path)
+
 
 def insert_HandlingTime_path(path):
     if path:
         entry_HandlingTime_path.delete(0, tk.END)
         entry_HandlingTime_path.insert(0, path)
 
+
 def browse_HandlingTime_file():
-    input_file_path = filedialog.askopenfilename(defaultextension=".txt", filetypes=[("TXT files", "*.txt")], initialdir=expanduser("~") + "/Desktop/")
+    input_file_path = filedialog.askopenfilename(defaultextension=".txt", filetypes=[("TXT files", "*.txt")],
+                                                 initialdir=expanduser("~") + "/Desktop/")
     insert_HandlingTime_path(input_file_path)
 
+
 def browse_CallIntensity_file():
-    input_file_path = filedialog.askopenfilename(defaultextension=".txt", filetypes=[("TXT files", "*.txt")], initialdir=expanduser("~") + "/Desktop/")
+    input_file_path = filedialog.askopenfilename(defaultextension=".txt", filetypes=[("TXT files", "*.txt")],
+                                                 initialdir=expanduser("~") + "/Desktop/")
     insert_CallIntensity_path(input_file_path)
 
-def save_to_file(handling_time_data, intensity_time_data):
+
+def save_to_file(handling_time_data, intensity_time_data, newWindow):
     temp_dir = tempfile.gettempdir()
 
-    # Define file paths for saving handling time and intensity data
-    handling_time_file_path = tempfile.mktemp(suffix='.txt', dir=temp_dir)
-    intensity_file_path = tempfile.mktemp(suffix='.txt', dir=temp_dir)
+    if handling_time_data:
+        # Define file path for saving handling time
+        handling_time_file_path = tempfile.mktemp(suffix='.txt', dir=temp_dir)
 
-    # Write handling time data to handling_time.txt
-    with open(handling_time_file_path, "w") as handling_time_file:
-        handling_time_file.write(handling_time_data)
+        # Write handling time data to handling_time.txt
+        with open(handling_time_file_path, "w") as handling_time_file:
+            handling_time_file.write(handling_time_data)
 
-    # Write intensity data to intensity.txt
-    with open(intensity_file_path, "w") as intensity_file:
-        intensity_file.write(intensity_time_data)
+        insert_HandlingTime_path(handling_time_file_path)
+        newWindow.destroy()
 
-    insert_CallIntensity_path(intensity_file_path)
-    insert_HandlingTime_path(handling_time_file_path)
+    if intensity_time_data:
+        # Define file path for intensity data
+        intensity_file_path = tempfile.mktemp(suffix='.txt', dir=temp_dir)
 
-    print(f"HadlingTime: {handling_time_data}\n IntensityTime: {intensity_time_data}")
+        # Write intensity data to intensity.txt
+        with open(intensity_file_path, "w") as intensity_file:
+            intensity_file.write(intensity_time_data)
 
-def insert_data_manually():
+        insert_CallIntensity_path(intensity_file_path)
+        newWindow.destroy()
+
+    # print(f"HadlingTime: {handling_time_data}\n IntensityTime: {intensity_time_data}")
+
+
+def insert_handling_time_manually():
     newWindow = Toplevel(window)
-    newWindow.title("Insert Data Manually")
+    newWindow.title("Insert Handling Time Manually")
 
-    handling_time_data = scrolledtext.ScrolledText(newWindow,wrap=tk.WORD, width=40, height=20)
+    handling_time_data = scrolledtext.ScrolledText(newWindow, wrap=tk.WORD, width=60, height=30)
     handling_time_data.grid(column=0, row=0)
-    intensity_time_data = scrolledtext.ScrolledText(newWindow,wrap=tk.WORD, width=40, height=20)
-    intensity_time_data.grid(column=1, row=0)
 
-    save_data_button = tk.Button(newWindow, text="Save Data", command=lambda: save_to_file(handling_time_data.get("1.0", tk.END), intensity_time_data.get("1.0", tk.END)))
-    save_data_button.grid(column = 0, row=1, padx=20, pady=15, columnspan = 2)
+    save_data_button = tk.Button(newWindow, text="Save Data",
+                                 command=lambda: save_to_file(handling_time_data.get("1.0", tk.END), False, newWindow))
+    save_data_button.grid(column=0, row=1, padx=20, pady=15, columnspan=2)
 
     handling_time_data.focus()
+
+
+def insert_intensity_time_manually():
+    newWindow = Toplevel(window)
+    newWindow.title("Insert Intensity Time Manually")
+
+    intensity_time_data = scrolledtext.ScrolledText(newWindow, wrap=tk.WORD, width=60, height=30)
+    intensity_time_data.grid(column=0, row=0)
+
+    save_data_button = tk.Button(newWindow, text="Save Data",
+                                 command=lambda: save_to_file(False, intensity_time_data.get("1.0", tk.END), newWindow))
+    save_data_button.grid(column=0, row=1, padx=20, pady=15, columnspan=2)
+
+    intensity_time_data.focus()
 
 def generate_chart():
     start_time = int(entry_start_hour.get()) if entry_start_hour.get() else 0
@@ -86,12 +114,12 @@ def generate_chart():
             el_table = el.split()
             time_table.append(el_table[0])
 
-            if any(c.isalpha() for c in el_table[1]):
-                int_table.append((float(el_table[1].replace(',', '.'))))
-            else:
-                int_table.append(float(el_table[1]))
+            # if any(c.isdecimal() for c in el_table[1]):
+            int_table.append((float(el_table[1].replace(',', '.'))))
+            # else:
+            # int_table.append(float(el_table[1]))
 
-    traffic_table = [intensity*avg_time for intensity in int_table]
+    traffic_table = [intensity * avg_time for intensity in int_table]
     time_table_hours = [int(time) / 60 for time in time_table]
 
     filtered_traffic_table = []
@@ -101,9 +129,9 @@ def generate_chart():
             filtered_traffic_table.append(traffic_table[i])
             filtered_time_table.append(time_table_hours[i])
 
-    #generate chart
+    # generate chart
     plt.figure(figsize=(8, 6))
-    sns.lineplot(x = filtered_time_table, y = filtered_traffic_table)
+    sns.lineplot(x=filtered_time_table, y=filtered_traffic_table)
     plt.xlabel("Time (hours)")
     plt.ylabel("Traffic Intenisty")
     plt.title("Traffic Intensity Over Time")
@@ -111,6 +139,7 @@ def generate_chart():
     plt.xlim(start_time, end_time)
 
     plt.show()
+
 
 def time_average(file):
     total = 0
@@ -120,12 +149,13 @@ def time_average(file):
         total += num
         count += 1
     if count > 0:
-         return total/count
+        return total / count
+
 
 # Choosing method
 button_frame = tk.Frame(window)
 button_frame.configure(bg=BG_COLOR)
-button_frame.pack(pady = 50, padx=30)
+button_frame.pack(pady=50, padx=30)
 
 input_label_methods = tk.Label(button_frame, text="Choose the calculation method", bg=BG_COLOR, font=label_font)
 input_label_methods.grid(row=0, column=0, columnspan=2, pady=10)
@@ -140,9 +170,9 @@ method2_button.grid(row=1, column=1, padx=20, pady=5)
 # Choose the method of inserting data
 # Handling time
 input_label_data = tk.Label(button_frame, text="Import 'Handling Time'", bg=BG_COLOR, font=label_font)
-input_label_data.grid(row = 2, pady=(20, 5),  columnspan=2)
+input_label_data.grid(row=2, pady=(20, 5), columnspan=2)
 
-input_button = tk.Button(button_frame, text="Insert manually", command=insert_data_manually)
+input_button = tk.Button(button_frame, text="Insert manually", command=insert_handling_time_manually)
 input_button.grid(row=3, padx=20, pady=5)
 file_button = tk.Button(button_frame, text="Choose from file", command=browse_HandlingTime_file)
 file_button.grid(row=3, column=1, padx=20, pady=5)
@@ -150,11 +180,11 @@ file_button.grid(row=3, column=1, padx=20, pady=5)
 entry_HandlingTime_path = tk.Entry(button_frame, width=50, bg="#797a7e")
 entry_HandlingTime_path.grid(row=4, padx=20, columnspan=2)
 
-#Call intensity
+# Call intensity
 input_label_data = tk.Label(button_frame, text="Import 'Call intensity'", bg=BG_COLOR, font=label_font)
-input_label_data.grid(row = 5, pady=(20, 5),  columnspan=2)
+input_label_data.grid(row=5, pady=(20, 5), columnspan=2)
 
-input_button = tk.Button(button_frame, text="Insert manually", command = insert_data_manually)
+input_button = tk.Button(button_frame, text="Insert manually", command=insert_intensity_time_manually)
 input_button.grid(row=6, padx=20, pady=5)
 file_button = tk.Button(button_frame, text="Choose from file", command=browse_CallIntensity_file)
 file_button.grid(row=6, column=1, padx=20, pady=5)
@@ -162,7 +192,7 @@ file_button.grid(row=6, column=1, padx=20, pady=5)
 entry_CallIntensity_path = tk.Entry(button_frame, width=50, bg="#797a7e", )
 entry_CallIntensity_path.grid(row=7, padx=20, columnspan=2)
 
-#Input range
+# Input range
 label_start_hour = tk.Label(button_frame, text="Start Hour:", bg=BG_COLOR)
 label_start_hour.grid(row=8, column=0, pady=(20, 5))
 
@@ -175,8 +205,8 @@ entry_start_hour.grid(row=9, column=0)
 entry_end_hour = tk.Entry(button_frame, bg="#797a7e")
 entry_end_hour.grid(row=9, column=1)
 
-#Generate chart
+# Generate chart
 generate_button = tk.Button(button_frame, text="Generate Chart", command=generate_chart)
-generate_button.grid(row=10, padx=20, pady=15, columnspan = 2)
+generate_button.grid(row=10, padx=20, pady=15, columnspan=2)
 
 window.mainloop()
