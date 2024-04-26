@@ -166,11 +166,20 @@ def time_average(file):
     if count > 0:
         return total / count
 
+def calculate_intensity(file):
+    total = 0
+    for line in file:
+        num = float(line)
+        total += num
+    return total/86400
+
+def show_calculation_result():
+    input_data = entry_HandlingTime_path.get()
+    with open(input_data, "r") as myfile:
+        print(calculate_intensity(myfile))
 
 # Choosing method
-
 def Method1_gui():
-    # Show all input elements
     entry_HandlingTime_path.grid(row=4, padx=20, columnspan=2)
     entry_CallIntensity_path.grid(row=7, padx=20, columnspan=2)
     entry_start_hour.grid(row=9, column=0)
@@ -182,9 +191,10 @@ def Method1_gui():
     generate_button.grid(row=10, padx=20, pady=15, columnspan=2)
     label_start_hour.grid(row=8, column=0, pady=(20, 5))
     label_end_hour.grid(row=8, column=1, pady=(20, 5))
+    show_calculation_button.grid_forget()
+    entry_HandlingTime_path.delete(0, tk.END)
 
 def Method2_gui():
-    # Hide entry_CallIntensity_path, entry_start_hour, and entry_end_hour
     entry_CallIntensity_path.grid_forget()
     entry_start_hour.grid_forget()
     entry_end_hour.grid_forget()
@@ -194,6 +204,10 @@ def Method2_gui():
     generate_button.grid_forget()
     label_start_hour.grid_forget()
     label_end_hour.grid_forget()
+    show_calculation_button.grid(row=5, pady=(20, 5), columnspan=2)
+    entry_HandlingTime_path.delete(0, tk.END)
+
+
 
     
 button_frame = tk.Frame(window)
@@ -252,5 +266,10 @@ entry_end_hour.grid(row=9, column=1)
 # Generate chart
 generate_button = tk.Button(button_frame, text="Generate Chart", command=generate_chart)
 generate_button.grid(row=10, padx=20, pady=15, columnspan=2)
+
+#Calculate Button
+show_calculation_button = tk.Button(button_frame, text="Calculate", command=show_calculation_result)
+show_calculation_button.grid(row=5, pady=(20, 5), columnspan=2)
+show_calculation_button.grid_forget()
 
 window.mainloop()
