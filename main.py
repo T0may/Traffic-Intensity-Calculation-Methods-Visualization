@@ -68,9 +68,6 @@ def save_to_file(handling_time_data, intensity_time_data, newWindow):
         insert_CallIntensity_path(intensity_file_path)
         newWindow.destroy()
 
-    # print(f"HadlingTime: {handling_time_data}\n IntensityTime: {intensity_time_data}")
-
-
 def insert_handling_time_manually():
     newWindow = Toplevel(window)
     newWindow.title("Insert Handling Time Manually")
@@ -97,21 +94,6 @@ def insert_intensity_time_manually():
     save_data_button.grid(column=0, row=1, padx=20, pady=15, columnspan=2)
 
     intensity_time_data.focus()
-
-
-# def insert_data_manually():
-#  newWindow = Toplevel(window)
-#  newWindow.title("Insert Data Manually")
-#
-#  handling_time_data = scrolledtext.ScrolledText(newWindow,wrap=tk.WORD, width=40, height=20)
-#  handling_time_data.grid(column=0, row=0)
-#  intensity_time_data = scrolledtext.ScrolledText(newWindow,wrap=tk.WORD, width=40, height=20)
-#  intensity_time_data.grid(column=1, row=0)
-#
-#  save_data_button = tk.Button(newWindow, text="Save Data", command=lambda: save_to_file(handling_time_data.get("1.0", tk.END), intensity_time_data.get("1.0", tk.END)))
-#  save_data_button.grid(column = 0, row=1, padx=20, pady=15, columnspan = 2)
-#
-#  handling_time_data.focus()
 
 def generate_chart():
     start_time = int(entry_start_hour.get()) if entry_start_hour.get() else 0
@@ -176,7 +158,11 @@ def calculate_intensity(file):
 def show_calculation_result():
     input_data = entry_HandlingTime_path.get()
     with open(input_data, "r") as myfile:
-        print(calculate_intensity(myfile))
+        CallIntensity_result = calculate_intensity(myfile)
+    
+    global result
+    result = CallIntensity_result
+    result_label.config(text=f"Wynik: {result}")
 
 # Choosing method
 def Method1_gui():
@@ -193,6 +179,8 @@ def Method1_gui():
     label_end_hour.grid(row=8, column=1, pady=(20, 5))
     show_calculation_button.grid_forget()
     entry_HandlingTime_path.delete(0, tk.END)
+    result_label.grid_forget()
+
 
 def Method2_gui():
     entry_CallIntensity_path.grid_forget()
@@ -206,17 +194,26 @@ def Method2_gui():
     label_end_hour.grid_forget()
     show_calculation_button.grid(row=5, pady=(20, 5), columnspan=2)
     entry_HandlingTime_path.delete(0, tk.END)
+    result_label.grid(row=6, pady=(20, 5), columnspan=2)
+
+def open_help_window():
+    help_window = Toplevel(window)
+    help_window.title("Help")
+    help_label = Label(help_window, text="This is a help window. Here everything will be explained")
+    help_label.pack()
 
 
-
-    
 button_frame = tk.Frame(window)
 button_frame.configure(bg=BG_COLOR)
 button_frame.pack(pady=50, padx=30)
 
+helpim = PhotoImage(file="help.png").subsample(30)
+
+help = tk.Button(window, bd=0, image=helpim, command=open_help_window)
+help.place(relx=1.0, rely=0.0, anchor='ne', x=-20, y=20)
+
 input_label_methods = tk.Label(button_frame, text="Choose the calculation method", bg=BG_COLOR, font=label_font)
 input_label_methods.grid(row=0, column=0, columnspan=2, pady=10)
-
 
 v = IntVar(button_frame, value=1)
 
@@ -271,5 +268,12 @@ generate_button.grid(row=10, padx=20, pady=15, columnspan=2)
 show_calculation_button = tk.Button(button_frame, text="Calculate", command=show_calculation_result)
 show_calculation_button.grid(row=5, pady=(20, 5), columnspan=2)
 show_calculation_button.grid_forget()
+
+# Method 2 result
+result = 0
+result_label = tk.Label(button_frame, text=f"Wynik: {result}", bg = BG_COLOR, font=16 )
+result_label.grid(row=6, pady=(20, 5), columnspan=2)
+result_label.grid_forget()
+
 
 window.mainloop()
