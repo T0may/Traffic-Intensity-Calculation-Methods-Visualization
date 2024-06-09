@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import *
-from tkinter import font, filedialog, IntVar, scrolledtext
+from tkinter import font, filedialog, IntVar, scrolledtext, messagebox
 from os.path import expanduser
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -81,6 +81,16 @@ def insert_handling_time_manually():
 
     handling_time_data.focus()
 
+def validate_hour(entry, name):
+    try:
+        value = int(entry.get())
+        if 0 <= value <= 24:
+            return True
+        else:
+            raise ValueError
+    except ValueError:
+        messagebox.showerror("Invalid Input", f"{name} must be an integer between 0 and 24.")
+        return False
 
 def insert_intensity_time_manually():
     newWindow = Toplevel(window)
@@ -96,6 +106,10 @@ def insert_intensity_time_manually():
     intensity_time_data.focus()
 
 def generate_chart():
+
+    if not (validate_hour(entry_start_hour, "Start Hour") and validate_hour(entry_end_hour, "End Hour")):
+        return
+
     start_time = int(entry_start_hour.get()) if entry_start_hour.get() else 0
     end_time = int(entry_end_hour.get()) if entry_end_hour.get() else 24
 
@@ -199,7 +213,57 @@ def Method2_gui():
 def open_help_window():
     help_window = Toplevel(window)
     help_window.title("Help")
-    help_label = Label(help_window, text="This is a help window. Here everything will be explained")
+
+    help_frame = Frame(help_window)
+    help_frame.pack(pady=10, padx=10)
+
+    help_text = """
+    Witamy w Narzędziu do Wizualizacji i Obliczania Natężenia Ruchu!
+
+    To narzędzie pozwala na wizualizację i obliczanie natężenia ruchu za pomocą dwóch różnych metod.
+
+    1. **Wybór Metody Obliczeń:**
+       - Metoda 1: Wizualizacja natężenia ruchu w określonym przedziale czasowym.
+       - Metoda 2: Obliczanie całkowitego natężenia ruchu w ciągu dnia.
+       Wybierz pożądaną metodę, klikając odpowiedni przycisk radiowy.
+
+    2. **Wprowadzenie Danych o Czasie Obsługi:**
+       - Wstaw ręcznie: Otwiera nowe okno, w którym możesz wprowadzić dane o czasie obsługi.
+       - Wybierz z pliku: Otwiera okno dialogowe, aby wybrać plik tekstowy zawierający dane o czasie obsługi.
+       Dane o czasie obsługi powinny być podane w sekundach, jedna wartość na linię w formacie jak na zdjęciu wyżej:
+
+    3. **Wprowadzenie Danych o Natężeniu Ruchu (tylko Metoda 1):**
+       - Wstaw ręcznie: Otwiera nowe okno, w którym możesz wprowadzić dane o natężeniu ruchu.
+       - Wybierz z pliku: Otwiera okno dialogowe, aby wybrać plik tekstowy zawierający dane o natężeniu ruchu.
+       Dane o natężeniu ruchu powinny być podane w Erlangach, z czasem i natężeniem oddzielonymi spacją w formacie jak na zdjęciu wyżej.
+
+    4. **Określenie Przedziału Czasowego (tylko Metoda 1):**
+       - Godzina początkowa: Godzina początkowa dla wizualizacji (0 do 24).
+       - Godzina końcowa: Godzina końcowa dla wizualizacji (0 do 24).
+
+    5. **Generowanie Wykresu (tylko Metoda 1):**
+       - Kliknij "Generuj Wykres", aby wizualizować natężenie ruchu w określonym przedziale czasowym.
+
+    6. **Obliczanie (tylko Metoda 2):**
+       - Kliknij "Oblicz", aby obliczyć całkowite natężenie ruchu w ciągu dnia.
+
+
+    **Obliczenia Matematyczne:**
+
+    - **Średni Czas Obsługi:** Średni czas obsługi w sekundach, obliczony na podstawie wprowadzonych danych.
+      Wzór: Średni Czas Obsługi = Suma Czasów Obsługi / Liczba Wpisów
+
+    - **Natężenie Ruchu:** Całkowite natężenie ruchu, obliczone jako iloczyn natężenia ruchu i średniego czasu obsługi.
+      Wzór: Natężenie Ruchu = Suma(Natężenie Ruchu * Średni Czas Obsługi) / 86400s
+
+    """
+    help_label = Label(help_window, text=help_text)
+
+    example_image = PhotoImage(file="data_format_example.png")
+    image_label = Label(help_frame, image=example_image)
+    image_label.image = example_image 
+    image_label.pack()
+
     help_label.pack()
 
 
@@ -274,6 +338,5 @@ result = 0
 result_label = tk.Label(button_frame, text=f"Wynik: {result}", bg = BG_COLOR, font=16 )
 result_label.grid(row=6, pady=(20, 5), columnspan=2)
 result_label.grid_forget()
-
 
 window.mainloop()
